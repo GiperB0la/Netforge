@@ -435,4 +435,5 @@ Netforge.lib
 
 ## License
 
-See the `LICENSE` file in the repository.
+Netforge is licensed under the MIT License.
+See [LICENSE](LICENSE) for details.
