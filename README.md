@@ -171,15 +171,12 @@ protected:
 
     void on_start() override
     {
-        std::cout << "Client connected: "
-                  << address() << ':' << port()
-                  << std::endl;
+        std::cout << "Client connected: " << address() << ':' << port() << std::endl;
     }
 
     void on_stop() override
     {
-        std::cout << "Client disconnected"
-                  << std::endl;
+        std::cout << "Client disconnected" << std::endl;
     }
 };
 
@@ -190,16 +187,12 @@ int main()
     netforge::Server<EchoSession> server(io, 5000);
 
     server.set_error_handler([](const boost::system::error_code& ec) {
-        std::cerr << "Netforge server error: "
-                  << ec.message()
-                  << std::endl;
+        std::cerr << "Netforge server error: " << ec.message() << std::endl;
     });
 
     server.start();
 
-    std::cout << "Netforge server started on port "
-              << server.port()
-              << std::endl;
+    std::cout << "Netforge server started on port " << server.port() << std::endl;
 
     io.run();
 }
@@ -279,10 +272,7 @@ public:
     using TcpSession::TcpSession;
 
 protected:
-    void on_receive(
-        const std::uint8_t* data,
-        std::size_t size
-    ) override
+    void on_receive(const std::uint8_t* data, std::size_t size) override
     {
         // Handle received data
     }
@@ -310,10 +300,7 @@ void on_stop() override
 Incoming TCP data is delivered through:
 
 ```cpp
-void on_receive(
-    const std::uint8_t* data,
-    std::size_t size
-) override
+void on_receive(const std::uint8_t* data, std::size_t size) override
 {
     // Process data
 }
@@ -348,10 +335,7 @@ remote_endpoint()
 Example:
 
 ```cpp
-std::cout << address()
-          << ':'
-          << port()
-          << std::endl;
+std::cout << address() << ':' << port() << std::endl;
 ```
 
 ## Error handling
