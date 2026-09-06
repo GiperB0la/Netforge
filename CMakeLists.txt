@@ -6,11 +6,13 @@ project(Netforge
     LANGUAGES CXX
 )
 
+# ------------------------------------------------------------------------------
+# C++
+# ------------------------------------------------------------------------------
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-include(FetchContent)
 
 # ------------------------------------------------------------------------------
 # Options
@@ -20,22 +22,13 @@ option(NETFORGE_BUILD_EXAMPLES "Build Netforge examples" ON)
 option(NETFORGE_BUILD_TESTS "Build Netforge tests" OFF)
 
 # ------------------------------------------------------------------------------
-# Boost
+# Dependencies
 # ------------------------------------------------------------------------------
 
-find_package(Boost QUIET CONFIG)
+find_package(Boost CONFIG REQUIRED)
 
-if (NOT Boost_FOUND)
-    message(STATUS "Boost not found. Downloading Boost...")
-
-    FetchContent_Declare(
-        boost
-        URL https://github.com/boostorg/boost/releases/download/boost-1.92.0/boost-1.92.0-cmake.tar.gz
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-
-    FetchContent_MakeAvailable(boost)
-endif()
+message(STATUS "Boost version: ${Boost_VERSION}")
+message(STATUS "Boost directory: ${Boost_DIR}")
 
 # ------------------------------------------------------------------------------
 # Netforge
@@ -46,11 +39,11 @@ add_library(Netforge
     src/TcpSession.cpp
 )
 
+add_library(Netforge::Netforge ALIAS Netforge)
+
 set_target_properties(Netforge PROPERTIES
     OUTPUT_NAME "Netforge$<$<CONFIG:Debug>:_d>"
 )
-
-add_library(Netforge::Netforge ALIAS Netforge)
 
 target_compile_features(Netforge
     PUBLIC
@@ -72,7 +65,7 @@ target_link_libraries(Netforge
 # Examples
 # ------------------------------------------------------------------------------
 
-if (NETFORGE_BUILD_EXAMPLES)
+if(NETFORGE_BUILD_EXAMPLES)
 
     add_executable(netforge_echo
         examples/echo/Main.cpp
@@ -82,5 +75,17 @@ if (NETFORGE_BUILD_EXAMPLES)
         PRIVATE
             Netforge::Netforge
     )
+
+endif()
+
+# ------------------------------------------------------------------------------
+# Tests
+# ------------------------------------------------------------------------------
+
+if(NETFORGE_BUILD_TESTS)
+
+    enable_testing()
+
+    # Add tests here.
 
 endif()
