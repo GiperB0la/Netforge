@@ -2,7 +2,7 @@
 
 Lightweight asynchronous TCP networking library for modern C++.
 
-Netforge provides a simple object-oriented API for building asynchronous TCP servers on top of Asio. It handles accepting connections, session lifetime, asynchronous reads and writes, write queues, and safe access to session state.
+Netforge provides a simple object-oriented API for building asynchronous TCP servers on top of Boost.Asio. It handles accepting connections, session lifetime, asynchronous reads and writes, write queues, and safe access to session state.
 
 ## Features
 
@@ -24,10 +24,12 @@ Netforge provides a simple object-oriented API for building asynchronous TCP ser
 
 - C++20 compatible compiler
 - CMake 3.20 or newer
+- Boost
 - Git
-- Asio
 
-The project uses CMake `FetchContent` to obtain Asio automatically when it is not already available on the system.
+Netforge uses Boost.Asio for asynchronous TCP networking.
+
+Boost is **not downloaded automatically by CMake**. It must be installed separately.
 
 ### Supported compilers
 
@@ -52,7 +54,7 @@ Netforge/
 │   └── TcpSession.cpp
 ├── examples/
 │   └── echo/
-│       └── main.cpp
+│       └── Main.cpp
 └── README.md
 ```
 
@@ -65,43 +67,104 @@ git clone https://github.com/GiperB0la/Netforge.git
 cd Netforge
 ```
 
-Create a build directory:
+### Linux
+
+Install the required dependencies.
+
+On Debian/Ubuntu:
 
 ```bash
-mkdir build
-cd build
+sudo apt update
+sudo apt install build-essential cmake libboost-all-dev
 ```
 
-Configure the project:
+Configure a Debug build:
 
 ```bash
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build/linux-debug \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DNETFORGE_BUILD_EXAMPLES=ON \
+    -DNETFORGE_BUILD_TESTS=OFF
 ```
 
 Build:
 
 ```bash
-cmake --build . -j$(nproc)
+cmake --build build/linux-debug --parallel
 ```
 
-On Windows with Visual Studio:
+For a Release build:
+
+```bash
+cmake -S . -B build/linux-release \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DNETFORGE_BUILD_EXAMPLES=ON \
+    -DNETFORGE_BUILD_TESTS=OFF
+```
+
+Build:
+
+```bash
+cmake --build build/linux-release --parallel
+```
+
+### Windows
+
+Windows builds use Visual Studio and vcpkg for Boost dependencies.
+
+Install Boost through vcpkg:
 
 ```powershell
-cmake ..
-cmake --build . --config Release
+vcpkg install boost-asio:x64-windows
 ```
 
-The example application will be built as:
+Configure a Debug build:
+
+```powershell
+cmake -S . -B build/windows-debug `
+    -A x64 `
+    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+    -DNETFORGE_BUILD_EXAMPLES=ON `
+    -DNETFORGE_BUILD_TESTS=OFF
+```
+
+Build:
+
+```powershell
+cmake --build build/windows-debug --config Debug --parallel
+```
+
+Configure a Release build:
+
+```powershell
+cmake -S . -B build/windows-release `
+    -A x64 `
+    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+    -DNETFORGE_BUILD_EXAMPLES=ON `
+    -DNETFORGE_BUILD_TESTS=OFF
+```
+
+Build:
+
+```powershell
+cmake --build build/windows-release --config Release --parallel
+```
+
+> Replace `C:/vcpkg` with the actual path to your vcpkg installation if it is installed elsewhere.
+
+### Build directories
+
+The recommended build layout is:
 
 ```text
-netforge_echo
+build/
+├── linux-debug/
+├── linux-release/
+├── windows-debug/
+└── windows-release/
 ```
 
-On Windows:
-
-```text
-Release/netforge_echo.exe
-```
+Debug and Release builds are kept in separate directories to avoid mixing generated files and build configurations.
 
 ## Echo server example
 
@@ -374,66 +437,129 @@ User-defined session classes implement application-specific behavior.
 
 Examples are enabled by default.
 
-To disable them:
+To disable them on Linux:
 
 ```bash
-cmake .. -DNETFORGE_BUILD_EXAMPLES=OFF
-cmake --build .
+cmake -S . -B build/linux-release \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DNETFORGE_BUILD_EXAMPLES=OFF
+
+cmake --build build/linux-release --parallel
+```
+
+On Windows:
+
+```powershell
+cmake -S . -B build/windows-release `
+    -A x64 `
+    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+    -DNETFORGE_BUILD_EXAMPLES=OFF
+
+cmake --build build/windows-release --config Release --parallel
 ```
 
 ## Building tests
 
-Tests can be enabled with:
+Tests are disabled by default.
+
+Enable them with:
+
+### Linux
 
 ```bash
-cmake .. -DNETFORGE_BUILD_TESTS=ON
-cmake --build .
+cmake -S . -B build/linux-debug \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DNETFORGE_BUILD_TESTS=ON
+
+cmake --build build/linux-debug --parallel
 ```
 
-## Debug build
+### Windows
 
-Linux:
+```powershell
+cmake -S . -B build/windows-debug `
+    -A x64 `
+    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+    -DNETFORGE_BUILD_TESTS=ON
+
+cmake --build build/windows-debug --config Debug --parallel
+```
+
+Tests can then be executed with:
 
 ```bash
-mkdir build_linux_debug
-cd build_linux_debug
-
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake --build . -j$(nproc)
+ctest --test-dir build/linux-debug
 ```
 
-The Debug library is named:
+On Windows:
+
+```powershell
+ctest --test-dir build/windows-debug -C Debug
+```
+
+## Build output
+
+The Netforge library is built with configuration-specific names.
+
+### Linux
+
+Debug:
 
 ```text
-libNetforge_d.a
+build/linux-debug/libNetforge_d.a
 ```
 
-## Release build
-
-Linux:
-
-```bash
-mkdir build_linux_release
-cd build_linux_release
-
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j$(nproc)
-```
-
-The Release library is named:
+Release:
 
 ```text
-libNetforge.a
+build/linux-release/libNetforge.a
 ```
 
-On Windows the corresponding names are:
+### Windows
+
+Debug:
 
 ```text
-Netforge_d.lib
-Netforge.lib
+build/windows-debug/Debug/Netforge_d.lib
 ```
+
+Release:
+
+```text
+build/windows-release/Release/Netforge.lib
+```
+
+The echo example is built as:
+
+### Linux
+
+```text
+build/linux-debug/netforge_echo
+build/linux-release/netforge_echo
+```
+
+### Windows
+
+```text
+build/windows-debug/Debug/netforge_echo.exe
+build/windows-release/Release/netforge_echo.exe
+```
+
+## CMake configuration
+
+Netforge uses the following CMake options:
+
+| Option | Default | Description |
+|---|---|---|
+| `NETFORGE_BUILD_EXAMPLES` | `ON` | Build example applications |
+| `NETFORGE_BUILD_TESTS` | `OFF` | Build tests |
+
+Netforge requires Boost to be available to CMake through `find_package(Boost CONFIG REQUIRED)`.
+
+The project does not download dependencies automatically.
 
 ## License
 
 Netforge is licensed under the MIT License.
+
 See [LICENSE](LICENSE) for details.
