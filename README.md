@@ -87,7 +87,7 @@ cmake --build . -j$(nproc)
 On Windows with Visual Studio:
 
 ```powershell
-cmake .. 
+cmake ..
 cmake --build . --config Release
 ```
 
@@ -103,55 +103,13 @@ On Windows:
 Release/netforge_echo.exe
 ```
 
-## Debug build
-
-Linux:
-
-```bash
-mkdir build_linux_debug
-cd build_linux_debug
-
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake --build . -j$(nproc)
-```
-
-The Debug library is named:
-
-```text
-libNetforge_d.a
-```
-
-## Release build
-
-Linux:
-
-```bash
-mkdir build_linux_release
-cd build_linux_release
-
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j$(nproc)
-```
-
-The Release library is named:
-
-```text
-libNetforge.a
-```
-
-On Windows the corresponding names are:
-
-```text
-Netforge_d.lib
-Netforge.lib
-```
-
 ## Echo server example
 
 The following example creates a TCP echo server. Every message received from a client is sent back to that client.
 
 ```cpp
 #include <iostream>
+#include <span>
 
 #include <boost/asio.hpp>
 
@@ -197,7 +155,7 @@ int main()
 
     io.run();
 
-	return 0;
+    return 0;
 }
 ```
 
@@ -284,19 +242,21 @@ protected:
 
 ### Connection lifecycle
 
-`TcpSession` provides lifecycle callbacks:
+`TcpSession` provides callbacks for connection lifecycle events:
 
 ```cpp
-void on_start() override
+void on_connected() override
 {
-    // Connection started
+    // Connection established
 }
 
-void on_stop() override
+void on_disconnected() override
 {
-    // Connection stopped
+    // Connection closed
 }
 ```
+
+These callbacks can be overridden by user-defined session classes to handle connection events.
 
 ### Receiving data
 
@@ -305,19 +265,23 @@ Incoming TCP data is delivered through:
 ```cpp
 void on_receive(const std::uint8_t* data, std::size_t size) override
 {
-    // Process data
+    // Process received data
 }
 ```
 
+The callback receives a pointer to the received data and its size.
+
+The received buffer is only valid for the duration of the callback. If the data needs to be stored, it must be copied.
+
 ### Sending data
 
-A session can send data using:
+A session can send data using a `std::vector`:
 
 ```cpp
 send(std::vector<std::uint8_t>(data, data + size));
 ```
 
-or:
+or a `std::span`:
 
 ```cpp
 send(std::span<const std::uint8_t>(data, size));
@@ -325,14 +289,16 @@ send(std::span<const std::uint8_t>(data, size));
 
 Outgoing messages are placed into an internal queue and written asynchronously.
 
+Multiple calls to `send()` are serialized internally, so application code does not need to manually synchronize concurrent writes.
+
 ## Session information
 
 A session provides information about its remote peer:
 
 ```cpp
-address()
-port()
-remote_endpoint()
+address();
+port();
+remote_endpoint();
 ```
 
 Example:
@@ -341,9 +307,15 @@ Example:
 std::cout << address() << ':' << port() << std::endl;
 ```
 
+`address()` returns the remote IP address.
+
+`port()` returns the remote TCP port.
+
+`remote_endpoint()` returns the underlying Asio remote endpoint.
+
 ## Error handling
 
-Server errors can be handled with:
+Server-level errors can be handled with:
 
 ```cpp
 server.set_error_handler(
@@ -354,7 +326,7 @@ server.set_error_handler(
 );
 ```
 
-Session errors can be handled by overriding:
+Session-level errors can be handled by overriding:
 
 ```cpp
 void on_error(const boost::system::error_code& ec) override
@@ -362,6 +334,8 @@ void on_error(const boost::system::error_code& ec) override
     std::cerr << ec.message() << std::endl;
 }
 ```
+
+Errors caused by normal connection termination, such as an EOF when a client closes the connection, may be reported through the session error callback depending on the underlying Asio operation.
 
 ## Architecture
 
@@ -388,9 +362,9 @@ Server<Session>
               User Session
 ```
 
-`Server` is responsible for accepting connections and managing active sessions.
+`Server` is responsible for accepting connections, managing active sessions, and broadcasting messages.
 
-`Session` provides the common connection lifecycle and networking state.
+`Session` provides common connection state and lifecycle functionality.
 
 `TcpSession` implements TCP-specific asynchronous I/O.
 
@@ -414,6 +388,49 @@ Tests can be enabled with:
 ```bash
 cmake .. -DNETFORGE_BUILD_TESTS=ON
 cmake --build .
+```
+
+## Debug build
+
+Linux:
+
+```bash
+mkdir build_linux_debug
+cd build_linux_debug
+
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake --build . -j$(nproc)
+```
+
+The Debug library is named:
+
+```text
+libNetforge_d.a
+```
+
+## Release build
+
+Linux:
+
+```bash
+mkdir build_linux_release
+cd build_linux_release
+
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . -j$(nproc)
+```
+
+The Release library is named:
+
+```text
+libNetforge.a
+```
+
+On Windows the corresponding names are:
+
+```text
+Netforge_d.lib
+Netforge.lib
 ```
 
 ## License
