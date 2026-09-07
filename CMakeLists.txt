@@ -37,6 +37,7 @@ message(STATUS "Boost directory: ${Boost_DIR}")
 add_library(Netforge
     src/Session.cpp
     src/TcpSession.cpp
+    src/HttpSession.cpp
 )
 
 add_library(Netforge::Netforge ALIAS Netforge)
@@ -67,11 +68,21 @@ target_link_libraries(Netforge
 
 if(NETFORGE_BUILD_EXAMPLES)
 
-    add_executable(netforge_echo
-        examples/echo/Main.cpp
+    add_executable(netforge_tcp_server
+        examples/tcp_server/main.cpp
     )
 
-    target_link_libraries(netforge_echo
+    target_link_libraries(netforge_tcp_server
+        PRIVATE
+            Netforge::Netforge
+    )
+
+
+    add_executable(netforge_http_server
+        examples/http_server/main.cpp
+    )
+
+    target_link_libraries(netforge_http_server
         PRIVATE
             Netforge::Netforge
     )
