@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/netforge_tcp_client.dir/link.d CMakeFiles/netforge_tcp_client.dir/examples/tcp/TcpClient.cpp.o -o netforge_tcp_client  libNetforge_d.a

@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-release/release/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

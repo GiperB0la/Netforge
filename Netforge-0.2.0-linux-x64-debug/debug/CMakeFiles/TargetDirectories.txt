@@ -1,7 +1,0 @@
-/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/CMakeFiles/Netforge.dir
-/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/CMakeFiles/netforge_tcp_client.dir
-/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/CMakeFiles/netforge_tcp_server.dir
-/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/CMakeFiles/netforge_http_client.dir
-/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/CMakeFiles/netforge_http_server.dir
-/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/CMakeFiles/edit_cache.dir
-/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/CMakeFiles/rebuild_cache.dir
