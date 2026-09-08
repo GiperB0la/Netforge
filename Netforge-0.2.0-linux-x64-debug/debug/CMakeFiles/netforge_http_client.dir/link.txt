@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/netforge_http_client.dir/link.d CMakeFiles/netforge_http_client.dir/examples/http/HttpClient.cpp.o -o netforge_http_client  libNetforge_d.a

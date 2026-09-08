@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Cpp\my_libraries\netforge\Netforge-0.2.0-windows-x64-release\release\CMakeFiles\1405d9b0517fd79ae388244b5e92d16a\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{CCAA5861-5E47-36B3-9EED-D731356BC7AD}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

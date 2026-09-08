@@ -1,0 +1,2 @@
+/usr/bin/ar qc libNetforge.a CMakeFiles/Netforge.dir/src/Session.cpp.o CMakeFiles/Netforge.dir/src/tcp/TcpSession.cpp.o CMakeFiles/Netforge.dir/src/http/HttpSession.cpp.o CMakeFiles/Netforge.dir/src/http/HttpClientSession.cpp.o
+/usr/bin/ranlib libNetforge.a

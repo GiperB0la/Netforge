@@ -80,8 +80,7 @@ namespace netforge
         }
 
         uint16_t port() const {
-            boost::system::error_code ec;
-            return acceptor_.local_endpoint(ec).port();
+            return port_;
         }
 
         std::size_t session_count() const {
@@ -148,6 +147,6 @@ namespace netforge
         std::atomic_bool running_{ false };
         std::function<void(const boost::system::error_code&)> error_handler_;
 
-        uint16_t port_;
+        uint16_t port_{ 0 };
     };
 }

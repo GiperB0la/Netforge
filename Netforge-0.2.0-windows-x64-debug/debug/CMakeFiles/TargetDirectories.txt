@@ -1,0 +1,7 @@
+D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-debug/debug/CMakeFiles/Netforge.dir
+D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-debug/debug/CMakeFiles/netforge_tcp_client.dir
+D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-debug/debug/CMakeFiles/netforge_tcp_server.dir
+D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-debug/debug/CMakeFiles/netforge_http_client.dir
+D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-debug/debug/CMakeFiles/netforge_http_server.dir
+D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-debug/debug/CMakeFiles/ALL_BUILD.dir
+D:/Cpp/my_libraries/netforge/Netforge-0.2.0-windows-x64-debug/debug/CMakeFiles/ZERO_CHECK.dir

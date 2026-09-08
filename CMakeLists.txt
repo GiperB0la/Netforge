@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(Netforge
-    VERSION 0.1.0
+    VERSION 0.2.0
     DESCRIPTION "Lightweight asynchronous networking library for modern C++"
     LANGUAGES CXX
 )
@@ -36,8 +36,9 @@ message(STATUS "Boost directory: ${Boost_DIR}")
 
 add_library(Netforge
     src/Session.cpp
-    src/TcpSession.cpp
-    src/HttpSession.cpp
+    src/tcp/TcpSession.cpp
+    src/http/HttpSession.cpp
+    src/http/HttpClientSession.cpp
 )
 
 add_library(Netforge::Netforge ALIAS Netforge)
@@ -68,8 +69,17 @@ target_link_libraries(Netforge
 
 if(NETFORGE_BUILD_EXAMPLES)
 
+    add_executable(netforge_tcp_client
+        examples/tcp/TcpClient.cpp
+    )
+
+    target_link_libraries(netforge_tcp_client
+        PRIVATE
+            Netforge::Netforge
+    )
+
     add_executable(netforge_tcp_server
-        examples/tcp_server/main.cpp
+        examples/tcp/TcpServer.cpp
     )
 
     target_link_libraries(netforge_tcp_server
@@ -77,9 +87,17 @@ if(NETFORGE_BUILD_EXAMPLES)
             Netforge::Netforge
     )
 
+    add_executable(netforge_http_client
+        examples/http/HttpClient.cpp
+    )
+
+    target_link_libraries(netforge_http_client
+        PRIVATE
+            Netforge::Netforge
+    )
 
     add_executable(netforge_http_server
-        examples/http_server/main.cpp
+        examples/http/HttpServer.cpp
     )
 
     target_link_libraries(netforge_http_server

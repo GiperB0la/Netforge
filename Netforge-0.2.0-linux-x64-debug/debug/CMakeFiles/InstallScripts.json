@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/mnt/d/Cpp/my_libraries/netforge/Netforge-0.2.0-linux-x64-debug/debug/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

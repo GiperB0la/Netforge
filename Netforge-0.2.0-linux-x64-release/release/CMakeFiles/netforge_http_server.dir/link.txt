@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/netforge_http_server.dir/link.d CMakeFiles/netforge_http_server.dir/examples/http/HttpServer.cpp.o -o netforge_http_server  libNetforge.a

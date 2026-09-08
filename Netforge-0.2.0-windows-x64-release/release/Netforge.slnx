@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f643a43f-2dda-3f3e-b446-66f2e39d3d44" DefaultStartup="true">
+		<BuildDependency Project="Netforge.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="netforge_http_client.vcxproj"/>
+		<BuildDependency Project="netforge_http_server.vcxproj"/>
+		<BuildDependency Project="netforge_tcp_client.vcxproj"/>
+		<BuildDependency Project="netforge_tcp_server.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="Netforge.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="db89d35f-a79d-3584-9bd5-ae4687afa38c">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="aa1d89cf-6fbf-3fd4-91e4-de248fb246d3"/>
+	<Project Path="netforge_http_client.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="bc10052c-02b2-3f54-9535-c29f3c05f856">
+		<BuildDependency Project="Netforge.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="netforge_http_server.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0eaa3c99-e370-3f6f-bea1-2641b8346785">
+		<BuildDependency Project="Netforge.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="netforge_tcp_client.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="16598ba5-98d9-3bf6-ab49-2c3da0504f86">
+		<BuildDependency Project="Netforge.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="netforge_tcp_server.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0ea8b0fc-f127-38e2-89de-6a5503d5ac56">
+		<BuildDependency Project="Netforge.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+</Solution>
