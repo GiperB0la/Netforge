@@ -1,73 +1,113 @@
 # Netforge
 
-Lightweight asynchronous TCP and HTTP networking library for modern C++.
+**Lightweight asynchronous TCP and HTTP networking library for modern C++.**
 
-Netforge provides a simple object-oriented API for building asynchronous network servers on top of Boost.Asio and Boost.Beast. It handles accepting connections, session lifetime, asynchronous reads and writes, write queues, connection lifecycle callbacks, and safe access to session state.
+Netforge is a small object-oriented networking library built on top of [Boost.Asio](https://www.boost.org/doc/libs/release/doc/html/boost_asio.html) and [Boost.Beast](https://www.boost.org/doc/libs/release/libs/beast/).
+
+It provides a simple session-based API for building asynchronous TCP and HTTP servers without having to manage the low-level connection lifecycle, asynchronous write queues, or synchronization yourself.
+
+```cpp
+netforge::Server<MySession> server(io, 8080);
+server.start();
+
+io.run();
+```
+
+The goal of Netforge is simple:
+
+> **Keep Boost.Asio's asynchronous model while removing repetitive server boilerplate.**
+
+---
 
 ## Features
 
-- Asynchronous TCP server
-- Asynchronous HTTP server
-- Object-oriented session architecture
-- `Server<Session>` template
-- `TcpSession` with asynchronous read/write
-- `HttpSession` with asynchronous HTTP request/response handling
-- Thread-safe writes through Asio strands
+- Asynchronous TCP servers
+- Asynchronous HTTP servers
+- `Server<Session>` architecture
+- Object-oriented session model
 - Automatic session lifetime management
-- Per-session outgoing message queue
-- Broadcast messages to all connected TCP sessions
-- Connection lifecycle callbacks
-- Error handling callbacks
+- Asynchronous read/write operations
+- Per-session outgoing message queues
+- Thread-safe writes using Asio strands
+- TCP connection lifecycle callbacks
+- Session-level error handling
+- Server-level error handling
+- TCP broadcasting to connected sessions
+- Remote endpoint information
 - C++20
-- CMake-based build system
-- Debug and Release configurations
+- CMake
+- Linux and Windows support
+- MIT License
+
+---
+
+## Why Netforge?
+
+Boost.Asio is powerful, but building a complete server around it usually means writing a fair amount of infrastructure:
+
+- accept loops
+- session ownership
+- connection lifetime management
+- asynchronous reads
+- asynchronous writes
+- write serialization
+- outgoing queues
+- connection callbacks
+- error handling
+
+Netforge handles this infrastructure so application code can focus on the actual protocol or application logic.
+
+Instead of building the same networking boilerplate for every project:
+
+```text
+accept
+  ↓
+create socket
+  ↓
+create session
+  ↓
+manage lifetime
+  ↓
+async_read
+  ↓
+process data
+  ↓
+queue async_write
+  ↓
+handle disconnect
+  ↓
+repeat
+```
+
+you define a session and implement your application logic.
+
+---
+
+# Quick Start
 
 ## Requirements
 
 - C++20 compatible compiler
-- CMake 3.20 or newer
+- CMake 3.20+
 - Boost
 - Git
 
-Netforge uses:
-
-- Boost.Asio for asynchronous networking
-- Boost.Beast for HTTP
-
-Boost is **not downloaded automatically by CMake**. It must be installed separately.
-
-### Supported compilers
-
-Netforge is intended to work with modern:
+Supported compilers:
 
 - MSVC
 - GCC
 - Clang
 
-## Project structure
+Netforge uses:
 
-```text
-Netforge/
-├── CMakeLists.txt
-├── include/
-│   └── netforge/
-│       ├── HttpSession.hpp
-│       ├── Server.hpp
-│       ├── Session.hpp
-│       └── TcpSession.hpp
-├── src/
-│   ├── HttpSession.cpp
-│   ├── Session.cpp
-│   └── TcpSession.cpp
-├── examples/
-│   ├── tcp_server/
-│   │   └── main.cpp
-│   └── http_server/
-│       └── main.cpp
-└── README.md
-```
+- **Boost.Asio** for asynchronous networking
+- **Boost.Beast** for HTTP
 
-## Quick start
+Boost must be installed separately. Netforge does not download dependencies automatically.
+
+---
+
+## Installation
 
 Clone the repository:
 
@@ -78,8 +118,6 @@ cd Netforge
 
 ### Linux
 
-Install the required dependencies.
-
 On Debian/Ubuntu:
 
 ```bash
@@ -87,101 +125,48 @@ sudo apt update
 sudo apt install build-essential cmake libboost-all-dev
 ```
 
-### Debug
-
-Configure:
+Configure and build:
 
 ```bash
-cmake -S . -B build/linux-debug \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DNETFORGE_BUILD_EXAMPLES=ON \
-    -DNETFORGE_BUILD_TESTS=OFF
-```
-
-Build:
-
-```bash
-cmake --build build/linux-debug --parallel
-```
-
-### Release
-
-Configure:
-
-```bash
-cmake -S . -B build/linux-release \
+cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
-    -DNETFORGE_BUILD_EXAMPLES=ON \
-    -DNETFORGE_BUILD_TESTS=OFF
-```
+    -DNETFORGE_BUILD_EXAMPLES=ON
 
-Build:
-
-```bash
-cmake --build build/linux-release --parallel
+cmake --build build --parallel
 ```
 
 ### Windows
 
-Windows builds use Visual Studio and vcpkg for Boost dependencies.
-
-Install Boost through vcpkg:
+Install Boost using vcpkg:
 
 ```powershell
 vcpkg install boost:x64-windows
 ```
 
-Configure a Debug build:
+Configure:
 
 ```powershell
-cmake -S . -B build/windows-debug `
+cmake -S . -B build `
     -A x64 `
     -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
-    -DNETFORGE_BUILD_EXAMPLES=ON `
-    -DNETFORGE_BUILD_TESTS=OFF
+    -DNETFORGE_BUILD_EXAMPLES=ON
 ```
 
 Build:
 
 ```powershell
-cmake --build build/windows-debug --config Debug --parallel
+cmake --build build --config Release --parallel
 ```
 
-Configure a Release build:
+Replace `C:/vcpkg` with your actual vcpkg installation path.
 
-```powershell
-cmake -S . -B build/windows-release `
-    -A x64 `
-    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
-    -DNETFORGE_BUILD_EXAMPLES=ON `
-    -DNETFORGE_BUILD_TESTS=OFF
-```
+---
 
-Build:
+# TCP Server
 
-```powershell
-cmake --build build/windows-release --config Release --parallel
-```
+The basic Netforge building block is a session.
 
-> Replace `C:/vcpkg` with the actual path to your vcpkg installation if it is installed elsewhere.
-
-### Build directories
-
-The recommended build layout is:
-
-```text
-build/
-├── linux-debug/
-├── linux-release/
-├── windows-debug/
-└── windows-release/
-```
-
-Debug and Release builds are kept in separate directories to avoid mixing generated files and build configurations.
-
-## TCP server
-
-A custom TCP session is created by inheriting from `netforge::TcpSession`:
+Create a TCP server by inheriting from `netforge::TcpSession`:
 
 ```cpp
 #include <iostream>
@@ -200,22 +185,18 @@ public:
 protected:
     void on_connected() override
     {
-        std::cout << "Tcp client connected: "
-                  << address() << ':' << port() << std::endl;
+        std::cout << "Client connected: "
+                  << address() << ':' << port() << '\n';
     }
 
     void on_receive(const std::uint8_t* data, std::size_t size) override
     {
-        std::cout << "Tcp received "
-                  << size << " bytes" << std::endl;
-
         send(std::span(data, size));
     }
 
     void on_disconnected() override
     {
-        std::cout << "Tcp client disconnected: "
-                  << address() << ':' << port() << std::endl;
+        std::cout << "Client disconnected\n";
     }
 };
 
@@ -223,43 +204,40 @@ int main()
 {
     boost::asio::io_context io;
 
-    netforge::Server<EchoSession> tcp_server(io, 5000);
+    netforge::Server<EchoSession> server(io, 5000);
 
-    tcp_server.set_error_handler([](const boost::system::error_code& ec) {
-        std::cerr << "Tcp server error: "
-                  << ec.message() << std::endl;
-    });
+    server.start();
 
-    tcp_server.start();
-
-    std::cout << "Netforge tcp_server started on port "
-              << tcp_server.port() << std::endl;
+    std::cout << "Server listening on port "
+              << server.port() << '\n';
 
     io.run();
-
-    return 0;
 }
 ```
 
-The example is available in:
+That's it.
+
+The server accepts connections, creates `EchoSession` instances, manages their lifetime, performs asynchronous I/O, and serializes outgoing writes.
+
+The complete example is available at:
 
 ```text
 examples/tcp_server/main.cpp
 ```
 
-Start the server:
+You can test it with any TCP client:
 
 ```text
-Netforge tcp_server started on port 5000
+localhost:5000
 ```
 
-Connect any TCP client to port `5000` and send data. The server will return the same data.
+The example implements a simple echo server: every received message is sent back to the client.
 
-## HTTP server
+---
 
-Netforge provides `HttpSession` for asynchronous HTTP request/response handling using Boost.Beast.
+# HTTP Server
 
-A custom HTTP session is created by inheriting from `netforge::HttpSession`:
+Netforge also provides `HttpSession` for asynchronous HTTP handling using Boost.Beast.
 
 ```cpp
 #include <iostream>
@@ -269,28 +247,27 @@ A custom HTTP session is created by inheriting from `netforge::HttpSession`:
 #include <netforge/Server.hpp>
 #include <netforge/HttpSession.hpp>
 
-class MyHttpSession : public netforge::HttpSession
+class HttpSession : public netforge::HttpSession
 {
 public:
-    using HttpSession::HttpSession;
+    using netforge::HttpSession::HttpSession;
 
 protected:
-    void on_connected() override
-    {
-        std::cout << "Http client connected: "
-                  << address() << ':' << port() << std::endl;
-    }
-
     void on_request(
-        const boost::beast::http::request<boost::beast::http::string_body>& request
+        const boost::beast::http::request<
+            boost::beast::http::string_body
+        >& request
     ) override
     {
-        boost::beast::http::response<boost::beast::http::string_body> response{
+        boost::beast::http::response<
+            boost::beast::http::string_body
+        > response{
             boost::beast::http::status::ok,
             request.version()
         };
 
         response.keep_alive(request.keep_alive());
+
         response.set(
             boost::beast::http::field::content_type,
             "text/plain"
@@ -301,49 +278,24 @@ protected:
 
         send(std::move(response));
     }
-
-    void on_disconnected() override
-    {
-        std::cout << "Http client disconnected: "
-                  << address() << ':' << port() << std::endl;
-    }
 };
 
 int main()
 {
     boost::asio::io_context io;
 
-    netforge::Server<MyHttpSession> http_server(io, 8080);
+    netforge::Server<HttpSession> server(io, 8080);
 
-    http_server.set_error_handler([](const boost::system::error_code& ec) {
-        std::cerr << "Http server error: "
-                  << ec.message() << std::endl;
-    });
+    server.start();
 
-    http_server.start();
-
-    std::cout << "Netforge http_server started on port "
-              << http_server.port() << std::endl;
+    std::cout << "HTTP server listening on port "
+              << server.port() << '\n';
 
     io.run();
-
-    return 0;
 }
 ```
 
-The example is available in:
-
-```text
-examples/http_server/main.cpp
-```
-
-Start the server:
-
-```text
-Netforge http_server started on port 8080
-```
-
-Then open:
+Run the server and open:
 
 ```text
 http://localhost:8080/
@@ -355,9 +307,82 @@ The server responds with:
 Hello from Netforge!
 ```
 
-## Server
+Complete example:
 
-A server is created using the `Server<Session>` template:
+```text
+examples/http_server/main.cpp
+```
+
+---
+
+# Architecture
+
+Netforge uses a simple layered architecture:
+
+```text
+                    Server<Session>
+                          │
+                    accepts TCP
+                          │
+                          ▼
+                       Session
+                          │
+             ┌────────────┴────────────┐
+             │                         │
+             ▼                         ▼
+        TcpSession                HttpSession
+             │                         │
+       async TCP I/O             Boost.Beast
+             │                         │
+             ▼                         ▼
+      User TCP Session          User HTTP Session
+```
+
+### `Server<Session>`
+
+Responsible for:
+
+- accepting connections
+- creating sessions
+- tracking active sessions
+- stopping the server
+- broadcasting messages
+
+### `Session`
+
+Provides common connection functionality:
+
+- connection state
+- remote endpoint information
+- lifecycle callbacks
+- error handling
+
+### `TcpSession`
+
+Provides:
+
+- asynchronous TCP reads
+- asynchronous TCP writes
+- outgoing message queue
+- serialized writes
+- TCP-specific callbacks
+
+### `HttpSession`
+
+Provides:
+
+- HTTP request parsing
+- asynchronous HTTP handling
+- HTTP response sending
+- Boost.Beast integration
+
+Application-specific behavior is implemented in user-defined session classes.
+
+---
+
+# Server API
+
+Create a server:
 
 ```cpp
 netforge::Server<MySession> server(io, 5000);
@@ -396,9 +421,11 @@ Get the number of active sessions:
 std::size_t count = server.session_count();
 ```
 
-## Broadcasting
+---
 
-`Server` can send a message to every currently connected TCP session:
+# Broadcasting
+
+TCP servers can broadcast data to all currently connected sessions:
 
 ```cpp
 std::vector<std::uint8_t> message = {
@@ -410,11 +437,13 @@ server.broadcast(message);
 
 Each session receives the message through its normal asynchronous send queue.
 
-## Sessions
+Application code does not need to manually synchronize concurrent writes.
 
-### TCP sessions
+---
 
-TCP sessions inherit from `netforge::TcpSession`:
+# TCP Sessions
+
+Create a custom TCP session by inheriting from `TcpSession`:
 
 ```cpp
 class MySession : public netforge::TcpSession
@@ -433,9 +462,51 @@ protected:
 };
 ```
 
-### HTTP sessions
+## Receiving data
 
-HTTP sessions inherit from `netforge::HttpSession`:
+Incoming data is delivered through:
+
+```cpp
+void on_receive(
+    const std::uint8_t* data,
+    std::size_t size
+) override
+{
+    // Process data
+}
+```
+
+The buffer is only valid for the duration of the callback.
+
+If the data needs to be stored after the callback returns, it must be copied.
+
+---
+
+## Sending data
+
+Send a `std::span`:
+
+```cpp
+send(std::span<const std::uint8_t>(data, size));
+```
+
+or a vector:
+
+```cpp
+send(std::vector<std::uint8_t>{
+    0x01, 0x02, 0x03
+});
+```
+
+Outgoing messages are placed into an internal queue and written asynchronously.
+
+Multiple `send()` calls are serialized internally.
+
+---
+
+# HTTP Sessions
+
+Create a custom HTTP session:
 
 ```cpp
 class MyHttpSession : public netforge::HttpSession
@@ -450,71 +521,19 @@ protected:
         >& request
     ) override
     {
-        // Handle request
+        // Handle HTTP request
     }
 };
 ```
 
-## Connection lifecycle
+HTTP requests are delivered through `on_request()`.
 
-Sessions provide callbacks for connection lifecycle events:
-
-```cpp
-void on_connected() override
-{
-    // Connection established
-}
-
-void on_disconnected() override
-{
-    // Connection closed
-}
-```
-
-These callbacks can be overridden by user-defined session classes to handle connection events.
-
-## Receiving TCP data
-
-Incoming TCP data is delivered through:
+Responses can be sent asynchronously:
 
 ```cpp
-void on_receive(
-    const std::uint8_t* data,
-    std::size_t size
-) override
-{
-    // Process received data
-}
-```
-
-The callback receives a pointer to the received data and its size.
-
-The received buffer is only valid for the duration of the callback. If the data needs to be stored, it must be copied.
-
-## Sending TCP data
-
-A session can send data using a `std::vector`:
-
-```cpp
-send(std::vector<std::uint8_t>(data, data + size));
-```
-
-or a `std::span`:
-
-```cpp
-send(std::span<const std::uint8_t>(data, size));
-```
-
-Outgoing messages are placed into an internal queue and written asynchronously.
-
-Multiple calls to `send()` are serialized internally, so application code does not need to manually synchronize concurrent writes.
-
-## Sending HTTP responses
-
-`HttpSession` provides an asynchronous `send()` overload for HTTP responses:
-
-```cpp
-boost::beast::http::response<boost::beast::http::string_body> response{
+boost::beast::http::response<
+    boost::beast::http::string_body
+> response{
     boost::beast::http::status::ok,
     request.version()
 };
@@ -532,22 +551,52 @@ response.prepare_payload();
 send(std::move(response));
 ```
 
-HTTP request handling is performed through:
+---
+
+# Connection Lifecycle
+
+Sessions provide connection lifecycle callbacks.
+
+When a connection is established:
 
 ```cpp
-void on_request(
-    const boost::beast::http::request<
-        boost::beast::http::string_body
-    >& request
-) override
+void on_connected() override
 {
-    // Handle request
+    std::cout << "Connected\n";
 }
 ```
 
-## Session information
+When a connection is closed:
 
-A session provides information about its remote peer:
+```cpp
+void on_disconnected() override
+{
+    std::cout << "Disconnected\n";
+}
+```
+
+This makes it easy to implement application-specific connection handling.
+
+For example:
+
+```cpp
+void on_connected() override
+{
+    std::cout << "Client connected: "
+              << address() << ':' << port() << '\n';
+}
+
+void on_disconnected() override
+{
+    std::cout << "Client disconnected\n";
+}
+```
+
+---
+
+# Session Information
+
+A session provides information about the remote peer:
 
 ```cpp
 address();
@@ -558,16 +607,21 @@ remote_endpoint();
 Example:
 
 ```cpp
-std::cout << address() << ':' << port() << std::endl;
+std::cout << address()
+          << ':'
+          << port()
+          << '\n';
 ```
 
 `address()` returns the remote IP address.
 
 `port()` returns the remote TCP port.
 
-`remote_endpoint()` returns the underlying Asio remote endpoint.
+`remote_endpoint()` returns the underlying Boost.Asio remote endpoint.
 
-## Error handling
+---
+
+# Error Handling
 
 Server-level errors can be handled with:
 
@@ -575,7 +629,9 @@ Server-level errors can be handled with:
 server.set_error_handler(
     [](const boost::system::error_code& ec)
     {
-        std::cerr << ec.message() << std::endl;
+        std::cerr << "Server error: "
+                  << ec.message()
+                  << '\n';
     }
 );
 ```
@@ -583,190 +639,185 @@ server.set_error_handler(
 Session-level errors can be handled by overriding:
 
 ```cpp
-void on_error(const boost::system::error_code& ec) override
+void on_error(
+    const boost::system::error_code& ec
+) override
 {
-    std::cerr << ec.message() << std::endl;
+    std::cerr << "Session error: "
+              << ec.message()
+              << '\n';
 }
 ```
 
-Errors caused by normal connection termination, such as an EOF when a client closes the connection, may be reported through the session error callback depending on the underlying Asio operation.
+Normal connection termination may result in errors such as `eof` depending on the underlying Asio operation.
 
-## Architecture
+---
 
-Netforge separates server, transport, and application responsibilities:
+# CMake Options
 
-```text
-                    Server<Session>
-                          │
-                          ├── accept
-                          │
-                          ├── session management
-                          │
-                          └── broadcast
-                               │
-                ┌──────────────┴──────────────┐
-                │                             │
-                ▼                             ▼
-           TcpSession                    HttpSession
-                │                             │
-                ├── async read                ├── HTTP read
-                ├── async write               ├── HTTP parse
-                ├── write queue               ├── HTTP response
-                └── callbacks                 └── callbacks
-                │                             │
-                ▼                             ▼
-          User TCP Session              User HTTP Session
-```
+Netforge provides the following CMake options:
 
-`Server` is responsible for accepting connections, managing active sessions, and broadcasting messages.
+| Option | Default | Description |
+|---|---:|---|
+| `NETFORGE_BUILD_EXAMPLES` | `ON` | Build example applications |
+| `NETFORGE_BUILD_TESTS` | `OFF` | Build tests |
 
-`Session` provides common connection state and lifecycle functionality.
-
-`TcpSession` implements TCP-specific asynchronous I/O.
-
-`HttpSession` implements HTTP-specific asynchronous I/O using Boost.Beast.
-
-User-defined session classes implement application-specific behavior.
-
-## Building without examples
-
-Examples are enabled by default.
-
-To disable them on Linux:
+For example:
 
 ```bash
-cmake -S . -B build/linux-release \
-    -DCMAKE_BUILD_TYPE=Release \
+cmake -S . -B build \
     -DNETFORGE_BUILD_EXAMPLES=OFF \
-    -DNETFORGE_BUILD_TESTS=OFF
-
-cmake --build build/linux-release --parallel
+    -DNETFORGE_BUILD_TESTS=ON
 ```
 
-On Windows:
+---
 
-```powershell
-cmake -S . -B build/windows-release `
-    -A x64 `
-    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
-    -DNETFORGE_BUILD_EXAMPLES=OFF `
-    -DNETFORGE_BUILD_TESTS=OFF
-
-cmake --build build/windows-release --config Release --parallel
-```
-
-## Building tests
+# Tests
 
 Tests are disabled by default.
 
 Enable them with:
 
-### Linux
-
 ```bash
-cmake -S . -B build/linux-debug \
+cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Debug \
     -DNETFORGE_BUILD_TESTS=ON
 
-cmake --build build/linux-debug --parallel
+cmake --build build --parallel
 ```
 
-### Windows
-
-```powershell
-cmake -S . -B build/windows-debug `
-    -A x64 `
-    -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
-    -DNETFORGE_BUILD_TESTS=ON
-
-cmake --build build/windows-debug --config Debug --parallel
-```
-
-Tests can then be executed with:
+Run:
 
 ```bash
-ctest --test-dir build/linux-debug
+ctest --test-dir build
 ```
 
 On Windows:
 
 ```powershell
-ctest --test-dir build/windows-debug -C Debug
+ctest --test-dir build -C Debug
 ```
 
-## Build output
+---
 
-The Netforge library is built with configuration-specific names.
-
-### Linux
-
-Debug:
+# Project Structure
 
 ```text
-build/linux-debug/libNetforge_d.a
+Netforge/
+├── CMakeLists.txt
+├── include/
+│   └── netforge/
+│       ├── HttpSession.hpp
+│       ├── Server.hpp
+│       ├── Session.hpp
+│       └── TcpSession.hpp
+│
+├── src/
+│   ├── HttpSession.cpp
+│   ├── Session.cpp
+│   └── TcpSession.cpp
+│
+├── examples/
+│   ├── tcp_server/
+│   │   └── main.cpp
+│   └── http_server/
+│       └── main.cpp
+│
+├── tests/
+│
+└── README.md
 ```
 
-Release:
+---
 
-```text
-build/linux-release/libNetforge.a
-```
+# Dependencies
 
-### Windows
+Netforge intentionally keeps its dependency stack small.
 
-Debug:
+### Boost.Asio
 
-```text
-build/windows-debug/Debug/Netforge_d.lib
-```
+Used for asynchronous networking, sockets, connection handling, and I/O.
 
-Release:
+### Boost.Beast
 
-```text
-build/windows-release/Release/Netforge.lib
-```
+Used for HTTP protocol handling.
 
-Examples are built as:
+Boost is an external dependency and must be installed separately.
 
-### Linux
+---
 
-```text
-build/linux-debug/netforge_tcp_server
-build/linux-debug/netforge_http_server
+# Design Goals
 
-build/linux-release/netforge_tcp_server
-build/linux-release/netforge_http_server
-```
+Netforge is designed around a few principles:
 
-### Windows
+### Simple API
 
-```text
-build/windows-debug/Debug/netforge_tcp_server.exe
-build/windows-debug/Debug/netforge_http_server.exe
+Common networking tasks should require as little boilerplate as possible.
 
-build/windows-release/Release/netforge_tcp_server.exe
-build/windows-release/Release/netforge_http_server.exe
-```
+### Asynchronous by default
 
-## CMake configuration
+Network operations are asynchronous and integrated with Boost.Asio's `io_context`.
 
-Netforge uses the following CMake options:
+### Explicit ownership
 
-| Option | Default | Description |
-|---|---|---|
-| `NETFORGE_BUILD_EXAMPLES` | `ON` | Build example applications |
-| `NETFORGE_BUILD_TESTS` | `OFF` | Build tests |
+Sessions are managed automatically by the server while still allowing application code to work with normal C++ classes.
 
-Netforge requires Boost to be available to CMake through:
+### Safe concurrent writes
 
-```cmake
-find_package(Boost CONFIG REQUIRED)
-```
+Outgoing data is serialized internally using per-session queues and Asio strands.
 
-The project does not download dependencies automatically.
+### Small scope
 
-## License
+Netforge is not intended to replace Boost.Asio.
 
-Netforge is licensed under the MIT License.
+It provides a higher-level server/session layer on top of it.
 
-See [LICENSE](LICENSE) for details.
+---
+
+# Roadmap
+
+Planned improvements include:
+
+- [ ] More comprehensive test coverage
+- [ ] More TCP server examples
+- [ ] HTTP routing
+- [ ] WebSocket sessions
+- [ ] TLS/SSL support
+- [ ] Package manager support
+- [ ] API documentation
+- [ ] Performance benchmarks
+- [ ] More complete examples and documentation
+
+The API may evolve as the project develops.
+
+---
+
+# Contributing
+
+Contributions, bug reports, feature requests, and improvements are welcome.
+
+Before submitting a pull request:
+
+1. Build the project.
+2. Run the existing tests.
+3. Make sure examples still compile.
+4. Keep changes focused.
+5. Follow the existing C++ style.
+
+For bugs and feature requests, open an issue on GitHub.
+
+---
+
+# License
+
+Netforge is released under the **MIT License**.
+
+See [LICENSE](LICENSE) for the full license text.
+
+---
+
+## Repository
+
+GitHub:
+
+https://github.com/GiperB0la/Netforge
