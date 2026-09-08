@@ -30,7 +30,6 @@ The core idea is simple:
 - Server-level error handling
 - Session-level error handling
 - Remote endpoint information
-- TCP broadcasting to connected sessions
 - C++20
 - CMake
 - Linux and Windows support
@@ -74,7 +73,6 @@ The transport-independent connection functionality is provided by the session la
 - creating session instances
 - managing active sessions
 - stopping the server
-- broadcasting data to connected sessions
 - reporting server-level errors
 
 ### Client
@@ -721,27 +719,6 @@ std::vector<std::uint8_t> packet(data, data + size);
 
 ---
 
-# Broadcasting
-
-TCP servers can broadcast data to connected sessions:
-
-```cpp
-std::vector<std::uint8_t> message = {
-    0x01,
-    0x02,
-    0x03,
-    0x04
-};
-
-tcp_server.broadcast(message);
-```
-
-The message is queued for every currently connected session.
-
-Each session processes the data through its normal asynchronous send queue.
-
----
-
 # Error Handling
 
 Server-level errors can be handled using:
@@ -814,12 +791,6 @@ Get the number of active sessions:
 
 ```cpp
 std::size_t count = server.session_count();
-```
-
-Broadcast data:
-
-```cpp
-server.broadcast(message);
 ```
 
 ---
