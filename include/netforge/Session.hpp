@@ -42,7 +42,7 @@ namespace netforge
     protected:
         boost::asio::ip::tcp::socket socket_;
         boost::asio::ip::tcp::endpoint remote_endpoint_;
-        boost::asio::strand<boost::asio::any_io_executor> strand_;
+        boost::asio::strand<boost::asio::io_context::executor_type> strand_;
 
     private:
         std::atomic_bool running_{ false };

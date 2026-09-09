@@ -4,7 +4,7 @@ namespace netforge
 {
     Session::Session(boost::asio::ip::tcp::socket socket)
         : socket_(std::move(socket)),
-        strand_(boost::asio::make_strand(socket_.get_executor()))
+        strand_(boost::asio::make_strand(static_cast<boost::asio::io_context&>(socket_.get_executor().context())))
     {
         boost::system::error_code ec;
         remote_endpoint_ = socket_.remote_endpoint(ec);

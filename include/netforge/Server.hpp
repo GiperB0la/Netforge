@@ -87,12 +87,6 @@ namespace netforge
             return sessions_.size();
         }
 
-        void broadcast(const std::vector<std::uint8_t>& data) {
-            for (auto& session : sessions_) {
-                session->send(data);
-            }
-        }
-
         void set_error_handler(std::function<void(const boost::system::error_code&)> handler) {
             error_handler_ = std::move(handler);
         }

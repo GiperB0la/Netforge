@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(Netforge
-    VERSION 0.2.0
+    VERSION 0.4.0
     DESCRIPTION "Lightweight asynchronous networking library for modern C++"
     LANGUAGES CXX
 )
@@ -39,6 +39,8 @@ add_library(Netforge
     src/tcp/TcpSession.cpp
     src/http/HttpSession.cpp
     src/http/HttpClientSession.cpp
+    src/websocket/WebsocketSession.cpp
+    src/websocket/WebsocketClientSession.cpp
 )
 
 add_library(Netforge::Netforge ALIAS Netforge)
@@ -101,6 +103,24 @@ if(NETFORGE_BUILD_EXAMPLES)
     )
 
     target_link_libraries(netforge_http_server
+        PRIVATE
+            Netforge::Netforge
+    )
+
+    add_executable(netforge_websocket_client
+        examples/websocket/WebsocketClient.cpp
+    )
+
+    target_link_libraries(netforge_websocket_client
+        PRIVATE
+            Netforge::Netforge
+    )
+
+    add_executable(netforge_websocket_server
+        examples/websocket/WebsocketServer.cpp
+    )
+
+    target_link_libraries(netforge_websocket_server
         PRIVATE
             Netforge::Netforge
     )
